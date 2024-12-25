@@ -4,6 +4,26 @@
   <meta charset="UTF-8">
   <title>Click and Drag</title>
   <link rel="stylesheet" href="style.css">
+	<style>
+        #container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 200px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .cube {
+            width: 100px;
+            height: 100px;
+            margin-right: 10px;
+            background-color: lightblue;
+            border: 2px solid #333;
+            cursor: grab;
+        }
+    </style>
 </head>
 <body>
   <div class="items">
@@ -35,36 +55,51 @@
   </div>
 
 <script>
-//Your code goes here 
-	const slider = document.querySelector('.items');
-  let isDown = false;
-  let startX;
-  let scrollLeft;
+//Your code go
+	document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('container');
+    const cubes = document.querySelectorAll('.cube');
+    
+    let isDragging = false;
+    let offsetX = 0;
+    let draggedCube = null;
 
-  slider.addEventListener('mousedown', (e) => {
-    isDown = true;
-    slider.classList.add('active');
-    startX = e.pageX - slider.offsetLeft;
-    scrollLeft = slider.scrollLeft;
-  });
+    // Mouse down event to start dragging
+    cubes.forEach(cube => {
+        cube.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            draggedCube = cube;
+            offsetX = e.clientX - cube.getBoundingClientRect().left;
+            cube.style.cursor = 'grabbing';
+        });
+    });
 
-  slider.addEventListener('mouseleave', () => {
-    isDown = false;
-    slider.classList.remove('active');
-  });
+    // Mouse move event to move the cube
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging && draggedCube) {
+            let newLeft = e.clientX - offsetX;
+            draggedCube.style.position = 'absolute';
+            draggedCube.style.left = `${newLeft}px`;
+        }
+    });
 
-  slider.addEventListener('mouseup', () => {
-    isDown = false;
-    slider.classList.remove('active');
-  });
-slider.addEventListener('mousemove', (e) => {
-  if(!isDown) return;  // stop the function from running
-  e.preventDefault();
-  const x = e.pageX - slider.offsetLeft;
-  const walk = (x - startX) * 3; //scroll-fast
-  slider.scrollLeft = scrollLeft - walk;
+    // Mouse up event to stop dragging
+    document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            draggedCube.style.cursor = 'grab';
+            draggedCube = null;
+        }
+    });
+
+    // Optional: Reset cubes back to initial position when mouse leaves the container
+    container.addEventListener('mouseleave', () => {
+        if (draggedCube) {
+            draggedCube.style.left = '';
+            draggedCube.style.position = '';
+        }
+    });
 });
-  
 </script>
 
   </body>
